@@ -1,5 +1,6 @@
 package com.portfolio.tracker.stocktracker.service;
 
+import com.portfolio.tracker.stocktracker.dto.AnnualStatementDTO;
 import com.portfolio.tracker.stocktracker.entity.Stock;
 import com.portfolio.tracker.stocktracker.dto.DailyPricesDTO;
 import com.portfolio.tracker.stocktracker.repository.StockRepository;
@@ -20,6 +21,12 @@ public class TickerService {
 
     @Value("${tiingo.host.url}")
     private String hostUrl;
+
+    @Value("${polygon.apiKey}")
+    private String polygonKey;
+
+    @Value("${polygon.host.url}")
+    private String polygonHostUrl;
 
     private StockRepository stockRepository;
 
@@ -87,6 +94,10 @@ public class TickerService {
             }
             stockRepository.save(stock);
         }
+    }
+
+    public List<AnnualStatementDTO> getAnnualStatements(String ticker) {
+        return RestExchange.getFundamentals(ticker,polygonKey,polygonHostUrl,"2013-01-01");
     }
 
     public double calculateSimpleMovingAverage(Queue<Double> prices) {

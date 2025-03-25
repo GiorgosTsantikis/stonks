@@ -38,6 +38,8 @@ public class TickerController {
     @GetMapping("/{ticker}/fundamentals")
     public ResponseEntity<String> seedFundamentals(@PathVariable("ticker") String ticker) {
         tickerService.seedFundamentals(ticker);
+        var result = tickerService.getAnnualStatements(ticker);
+        System.out.println(result);
         return ResponseEntity.ok(ticker);
     }
 
