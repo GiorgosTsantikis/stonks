@@ -392,8 +392,30 @@ public class Mapper {
             annualStatementDTO.setFinancials(financialsDTO);
             annualStatementDTO.setFiscalYear(node.get("fiscal_year").asText());
             list.add(annualStatementDTO);
+            //calculateKeyMetrics(annualStatementDTO);
         }
 
         return list;
+    }
+
+    public static void calculateKeyMetrics(AnnualStatementDTO annualStatementDTO) {
+        long netIncome = annualStatementDTO.getFinancials().getIncomeStatement().getNetIncomeLoss()
+                - annualStatementDTO.getFinancials().getCashFlowStatement().getNetCashFlow();
+                //- annualStatementDTO.getFinancials().getIncomeStatement();
+
+        double debtToEquityDE = (double) annualStatementDTO.getFinancials().getBalanceSheets().getLiabilities() / //financial leverage
+                annualStatementDTO.getFinancials().getBalanceSheets().getEquity();
+
+        double currentRatio = annualStatementDTO.getFinancials().getBalanceSheets().getCurrentAssets()/ //short term liquidity >1 means company can cover short-term debt
+                (double) annualStatementDTO.getFinancials().getBalanceSheets().getCurrentLiabilities();
+
+        double cashRatio = annualStatementDTO.getFinancials().getBalanceSheets().getCash()/
+                (double) annualStatementDTO.getFinancials().getBalanceSheets().getCurrentLiabilities();// >1 company has cash to cover short term liabilities
+
+        double longTermDebtToEquityRatio = (double) annualStatementDTO.getFinancials().getBalanceSheets().getLongTermDebt()/ //equity funded by long term debt
+                annualStatementDTO.getFinancials().getBalanceSheets().getEquity(); //lower is better
+
+        double equityRatio = (double) annualStatementDTO.getFinancials().getBalanceSheets().getEquity()/ //assets financed by equity
+                annualStatementDTO.getFinancials().getBalanceSheets().getAssets();
     }
 }
