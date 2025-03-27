@@ -14,7 +14,24 @@ public class Mapper {
     private static ObjectMapper mapper = new ObjectMapper();
 
 
-    public static List<AnnualStatementDTO> MapFinancials(String json) throws JsonProcessingException {
+    public static List<EarningsEstimateDTO> mapForwardEarnings(String json) throws JsonProcessingException {
+        List<EarningsEstimateDTO> list = new ArrayList<>();
+        JsonNode root = mapper.readTree(json);
+        JsonNode array = root.get("data");
+        for(JsonNode element : array){
+            JsonNode node = element.get("attributes");
+            EarningsEstimateDTO dto = new EarningsEstimateDTO();
+            dto.setSymbol(node.get("slug").asText().toUpperCase());
+            dto.setActual(node.get("actual").asLong());
+            dto.setConsensus(node.get("consensus").asLong());
+            dto.setYear(node.get("year").asText());
+            dto.setQuarter(node.get("quarter").asInt());
+            list.add(dto);
+        }
+        return list;
+    }
+
+    public static List<AnnualStatementDTO> mapFinancials(String json) throws JsonProcessingException {
         List<AnnualStatementDTO> list = new ArrayList<>();
 
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

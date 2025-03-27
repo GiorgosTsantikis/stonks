@@ -21,9 +21,9 @@ import java.util.List;
 
 public  class RestExchange {
 
+    public static RestTemplate restTemplate = new RestTemplate();
 
     public static List<DailyPricesDTO> getDecadeData(String ticker,String apiKey, String hostUrl) {
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization","Token " + apiKey);
         headers.set("Content-Type","application/json");
@@ -51,8 +51,6 @@ public  class RestExchange {
     }
 
     public static List<AnnualStatementDTO> getFundamentals(String ticker,String apiKey, String hostUrl, String startDate){
-        RestTemplate restTemplate = new RestTemplate();
-
         ResponseEntity<String> response = restTemplate.exchange(hostUrl +
                 "?ticker=" + ticker +
                 "&filling_date.gt=" + startDate
@@ -61,19 +59,22 @@ public  class RestExchange {
                 , HttpMethod.GET, new HttpEntity<>("body"), String.class);
 
         try{
-            return Mapper.MapFinancials(response.getBody());
+            return Mapper.mapFinancials(response.getBody());
         }catch (JsonProcessingException e){
             System.out.println(e.getMessage());
             return null;
         }
     }
 
-    //"https://api.polygon.io/
-    // vX/reference
-    // /financials?ticker=MSFT
-    // &timeframe=annual&
-    // order=asc
-    // &limit=100
-    // &sort=filing_date
-    // &apiKey=UN_I2CPHNYXbuPuhvrMNS6C6tknpAdgd"
+   public static String getEstimates(String ticker,String apiKey, String hostUrl){
+        HttpHeaders headers = new HttpHeaders();
+        String xRapidApiHost = "seeking-alpha.p.rapidapi.comseeking-alpha.p.rapidapi.com";
+        headers.set("x-rapidapi-host", xRapidApiHost);
+        headers.set("x-rapidapi-key", apiKey);
+
+        ResponseEntity<String> response = restTemplate.exchange(hostUrl +
+                "?symbol="+ticker.toLowerCase()
+        + "data_type=revenues&period_type=quarterly",HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
+   }
 }
